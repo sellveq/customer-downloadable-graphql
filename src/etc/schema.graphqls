@@ -3,8 +3,10 @@
 #
 # @category    ScandiPWA
 # @package     ScandiPWA_CustomerDownloadableGraphQl
-# @author      Daniels Stabulis <info@scandiweb.com>
-# @copyright   Copyright (c) 2018 Scandiweb, Ltd (https://scandiweb.com)
+# @copyright   Copyright © 2018 Scandiweb, Ltd (https://scandiweb.com)
+# @copyright   Modifications © Selveq. All rights reserved.
+# @license     OSL-3.0 (Open Software License ("OSL") v. 3.0)
+# See LICENSE for license details.
 ##
 
 type Query {

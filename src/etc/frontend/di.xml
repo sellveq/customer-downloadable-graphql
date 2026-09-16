@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!--
+/**
+ * @category    ScandiPWA
+ * @package     ScandiPWA_CustomerDownloadableGraphQl
+ * @copyright   Copyright © Selveq. All rights reserved.
+ * @license     OSL-3.0 (Open Software License ("OSL") v. 3.0)
+ * See LICENSE for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="ScandiPWA\Router\Controller\ConfigurableRouter"
+        type="ScandiPWA\Router\Controller\Router">
+        <arguments>
+            <argument name="ignoredURLs" xsi:type="array">
+                <item name="downloadableProducts" xsi:type="string">^/downloadable/download/.*</item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

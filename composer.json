@@ -1,11 +1,39 @@
 {
-    "name": "scandipwa/customer-downloadable-graphql",
-    "description": "Downloadable product support for ScandiPWA",
+    "name": "selveq/customer-downloadable-graphql",
+    "description": "Magento 2 Customer Downloadable GraphQl extension for ScandiPWA theme",
     "type": "magento2-module",
-    "license": ["OSL-3.0"],
+    "version": "2.0.0",
+    "license": [
+        "OSL-3.0"
+    ],
+    "authors": [
+        {
+            "name": "Scandiweb",
+            "homepage": "https://scandiweb.com",
+            "role": "Original author"
+        },
+        {
+            "name": "Selveq",
+            "homepage": "https://selveq.com",
+            "role": "Maintainer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/selveq/customer-downloadable-graphql/issues",
+        "source": "https://github.com/selveq/customer-downloadable-graphql"
+    },
     "require": {
-        "magento/framework": "*",
-        "magento/module-downloadable-graph-ql": "^100.4"
+        "php": "^8.3",
+        "magento/framework": "^103.0",
+        "magento/module-catalog": "^104.0",
+        "magento/module-customer-downloadable-graph-ql": "^100.4",
+        "magento/module-downloadable": "^100.4",
+        "magento/module-downloadable-graph-ql": "^100.4",
+        "magento/module-graph-ql": "^100.4",
+        "selveq/route717": "^3.0"
+    },
+    "replace": {
+        "scandipwa/customer-downloadable-graphql": "*"
     },
     "autoload": {
         "files": [
@@ -14,5 +42,11 @@
         "psr-4": {
             "ScandiPWA\\CustomerDownloadableGraphQl\\": "src/"
         }
+    },
+    "archive": {
+        "exclude": [
+            "/.github",
+            "/.gitignore"
+        ]
     }
 }

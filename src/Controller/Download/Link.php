@@ -1,12 +1,15 @@
 <?php
+
 /**
- * ScandiPWA CustomerDownloadableGraphQL
- *
  * @category    ScandiPWA
  * @package     ScandiPWA_CustomerDownloadableGraphQl
- * @author      Daniels Stabulis <info@scandiweb.com>
- * @copyright   Copyright (c) 2021 Scandiweb, Ltd (https://scandiweb.com)
+ * @copyright   Copyright 2014 Adobe. All Rights Reserved.
+ * @copyright   Copyright © 2021 Scandiweb, Ltd (https://scandiweb.com)
+ * @copyright   Modifications © Selveq. All rights reserved.
+ * @license     OSL-3.0 (Open Software License ("OSL") v. 3.0)
+ * See LICENSE for license details.
  */
+
 declare(strict_types=1);
 
 namespace ScandiPWA\CustomerDownloadableGraphQl\Controller\Download;
@@ -19,23 +22,17 @@ use Magento\Downloadable\Helper\Download as DownloadHelper;
 use Magento\Downloadable\Helper\File;
 use Magento\Downloadable\Model\Link\Purchased;
 use Magento\Downloadable\Model\Link\Purchased\Item as PurchasedLink;
-use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Exception\SessionException;
 use Magento\Framework\UrlInterface;
 
-/**
- * Class Link executes download link action.
- */
 class Link extends SourceLink
 {
     /**
-     * Download link action
-     *
-     * @return void|ResponseInterface
+     * {@inheritdoc}
+     * @throws SessionException
      */
     public function execute()
     {
-        $session = $this->_getCustomerSession();
-
         $id = $this->getRequest()->getParam('id', 0);
         /** @var PurchasedLink $linkPurchasedItem */
         $linkPurchasedItem = $this->_objectManager->create(
@@ -47,9 +44,10 @@ class Link extends SourceLink
 
         if (!$linkPurchasedItem->getId()) {
             $this->messageManager->addNotice(__("We can't find the link you requested."));
-            return $this->_redirect('/my-account/my-downloadable');
+            return $this->_redirect('my-account/my-downloadable');
         }
         if (!$this->_objectManager->get(Data::class)->getIsShareable($linkPurchasedItem)) {
+            $session = $this->_getCustomerSession();
             $customerId = $session->getCustomerId();
             if (!$customerId) {
                 /** @var Product $product */
@@ -73,7 +71,7 @@ class Link extends SourceLink
                     $this->_objectManager->create(
                         UrlInterface::class
                     )->getUrl(
-                        '/my-account/my-downloadable',
+                        'my-account/my-downloadable',
                         ['_secure' => true]
                     )
                 );
@@ -85,9 +83,11 @@ class Link extends SourceLink
             )->load(
                 $linkPurchasedItem->getPurchasedId()
             );
-            if ($linkPurchased->getCustomerId() !== $customerId) {
+
+            // the row gives the id as a string and the session may give an int, so both sides are cast
+            if ((int)$linkPurchased->getCustomerId() !== (int)$customerId) {
                 $this->messageManager->addNotice(__("We can't find the link you requested."));
-                return $this->_redirect('/my-account/my-downloadable');
+                return $this->_redirect('my-account/my-downloadable');
             }
         }
         $downloadsLeft = $linkPurchasedItem->getNumberOfDownloadsBought() -
@@ -95,8 +95,9 @@ class Link extends SourceLink
 
         $status = $linkPurchasedItem->getStatus();
 
-        // can add $status === PurchasedLink::LINK_STATUS_AVAILABLE && for his 'if', if there are some errors
-        if (($downloadsLeft || $linkPurchasedItem->getNumberOfDownloadsBought() == 0)) {
+        if ($status === PurchasedLink::LINK_STATUS_AVAILABLE
+            && ($downloadsLeft || $linkPurchasedItem->getNumberOfDownloadsBought() == 0)
+        ) {
             $resource = '';
             $resourceType = '';
             if ($linkPurchasedItem->getLinkType() === DownloadHelper::LINK_TYPE_URL) {
@@ -121,17 +122,22 @@ class Link extends SourceLink
                 $linkPurchasedItem->save();
                 // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage
                 exit(0);
-            } catch (Exception $e) {
-                $this->messageManager->addError(__('Something went wrong while getting the requested content.'));
+            } catch (Exception) {
+                $this->messageManager->addErrorMessage(
+                    __('Something went wrong while getting the requested content.')
+                );
             }
         } elseif ($status === PurchasedLink::LINK_STATUS_EXPIRED) {
             $this->messageManager->addNotice(__('The link has expired.'));
-        } elseif ($status === PurchasedLink::LINK_STATUS_PENDING || $status === PurchasedLink::LINK_STATUS_PAYMENT_REVIEW
+        } elseif ($status === PurchasedLink::LINK_STATUS_PENDING
+            || $status === PurchasedLink::LINK_STATUS_PAYMENT_REVIEW
         ) {
             $this->messageManager->addNotice(__('The link is not available.'));
         } else {
-            $this->messageManager->addError(__('Something went wrong while getting the requested content.'));
+            $this->messageManager->addErrorMessage(
+                __('Something went wrong while getting the requested content.')
+            );
         }
-        return $this->_redirect('/my-account/my-downloadable');
+        return $this->_redirect('my-account/my-downloadable');
     }
 }
